@@ -17,19 +17,27 @@ import prettierPlugin from 'eslint-plugin-prettier'
 const gitignorePath = path.resolve('.', '.gitignore')
 
 const jsConfig = defineConfig([
-    // ESLint recommended config
     {
         name: 'js/config',
         ...js.configs.recommended
     },
-    // Stylistic plugin
+
     plugins.stylistic,
-    // Import X plugin
     plugins.importX,
-    // Airbnb base recommended config
+
     ...configs.base.recommended,
-    // Strict import rules
-    rules.base.importsStrict
+    rules.base.importsStrict,
+
+    {
+        name: 'js/import-resolver',
+        settings: {
+            'import/resolver': {
+                typescript: {
+                    project: './tsconfig.json'
+                }
+            }
+        }
+    }
 ])
 
 const nextConfig = defineConfig([
@@ -44,7 +52,14 @@ const nextConfig = defineConfig([
     // Airbnb Next.js recommended config
     ...configs.next.recommended,
     // Strict React rules
-    rules.react.strict
+    rules.react.strict,
+
+    {
+        name: 'react/override',
+        rules: {
+            'react-hooks/set-state-in-effect': 'off'
+        }
+    }
 ])
 
 const typescriptConfig = defineConfig([

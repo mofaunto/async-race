@@ -29,4 +29,29 @@ const getCars = async ({
     }
 }
 
-export default getCars
+const getCar = async (id: number): Promise<Car> => {
+    const { data } = await apiClient.get<Car>(`/garage/${id}`)
+    return data
+}
+
+const createCar = async (car: Omit<Car, 'id'>): Promise<Car> => {
+    const { data } = await apiClient.post<Car>('/garage', car)
+    return data
+}
+
+const updateCar = async (id: number, car: Omit<Car, 'id'>): Promise<Car> => {
+    const { data } = await apiClient.put<Car>(`/garage/${id}`, car)
+    return data
+}
+
+const deleteCar = async (id: number): Promise<void> => {
+    await apiClient.delete(`/garage/${id}`)
+}
+
+export default {
+    getCars,
+    getCar,
+    createCar,
+    updateCar,
+    deleteCar
+}
