@@ -13,6 +13,7 @@ const WinnersView = (): React.ReactElement => {
     }, [page, sort, order, fetchWinners])
 
     const limit = 10
+    const totalPages = Math.ceil(total / limit)
 
     return (
         <div className="p-4">
@@ -60,8 +61,12 @@ const WinnersView = (): React.ReactElement => {
                     Prev
                 </button>
 
+                <span className="px-2">
+                    {page} / {totalPages || 1}
+                </span>
+
                 <button
-                    disabled={page * limit >= total}
+                    disabled={page >= totalPages}
                     onClick={() => setPage(page + 1)}
                     type="button"
                 >
