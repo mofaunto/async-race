@@ -19,25 +19,25 @@ const gitignorePath = path.resolve('.', '.gitignore')
 const jsConfig = defineConfig([
     {
         name: 'js/config',
-        ...js.configs.recommended
-    },
+        ...js.configs.recommended,
 
-    plugins.stylistic,
-    plugins.importX,
-
-    ...configs.base.recommended,
-    rules.base.importsStrict,
-
-    {
-        name: 'js/import-resolver',
         settings: {
+            'import-x/resolver-next': [
+                path.resolve('.')
+            ],
+
             'import/resolver': {
                 typescript: {
                     project: './tsconfig.json'
                 }
             }
         }
-    }
+    },
+
+    plugins.stylistic,
+    plugins.importX,
+    ...configs.base.recommended,
+    rules.base.importsStrict
 ])
 
 const nextConfig = defineConfig([
