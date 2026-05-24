@@ -3,7 +3,9 @@
 import { create } from 'zustand'
 
 import garageApi from '@/features/garage/api/garage.api'
+import winnersApi from '@/features/winners/api/winners.api'
 import apiClient from '@/shared/api/client'
+import useWinnersStore from '@/shared/store/winners.store'
 
 import type { Car } from '@/shared/types/car'
 
@@ -12,6 +14,7 @@ type RaceStatus = 'idle' | 'running' | 'finished'
 interface Winner {
     id: number
     time: number
+    name?: string
 }
 
 interface EngineStartResponse {
@@ -24,11 +27,8 @@ const engineApi = {
         const { data } = await apiClient.patch<EngineStartResponse>(
             '/engine',
             null,
-            {
-                params: { id, status: 'started' }
-            }
+            { params: { id, status: 'started' } }
         )
-
         return data
     },
 
@@ -36,11 +36,8 @@ const engineApi = {
         const { data } = await apiClient.patch<{ success: true }>(
             '/engine',
             null,
-            {
-                params: { id, status: 'drive' }
-            }
+            { params: { id, status: 'drive' } }
         )
-
         return data
     },
 
@@ -52,7 +49,7 @@ const engineApi = {
 }
 
 const getCarElement = (id: number): HTMLElement | null =>
-    document.querySelector<HTMLElement>(`[data-car-id="${id}"]`)
+    document.querySelector(`[data-car-id="${id}"]`)
 
 const applyTransform = (element: HTMLElement, value: string): void => {
     const el = element
@@ -70,6 +67,7 @@ interface GarageStore {
 
     raceStatus: RaceStatus
     winner: Winner | null
+    winnerBanner: boolean
 
     fetchCars: () => Promise<void>
     setPage: (page: number) => void
@@ -103,6 +101,7 @@ const useGarageStore = create<GarageStore>((set, get) => ({
 
     raceStatus: 'idle',
     winner: null,
+    winnerBanner: false,
 
     openCreateModal: () => set({ isModalOpen: true, editingCar: null }),
 
@@ -114,13 +113,15 @@ const useGarageStore = create<GarageStore>((set, get) => ({
 
     fetchCars: async () => {
         set({ isLoading: true })
-
         try {
-            const { items, total } = await garageApi.getCars({
+            const res = await garageApi.getCars({
                 page: get().page
             })
 
-            set({ cars: items, totalCars: total })
+            set({
+                cars: res.items,
+                totalCars: res.total
+            })
         } finally {
             set({ isLoading: false })
         }
@@ -145,19 +146,16 @@ const useGarageStore = create<GarageStore>((set, get) => ({
         const { start, drive } = engineApi
 
         const { velocity, distance } = await start(id)
-
         const duration = distance / velocity
 
         let startTime: number | null = null
         let frameId: number
 
-        const animate = (timestamp: number): void => {
-            startTime = startTime ?? timestamp
-
-            const progress = Math.min((timestamp - startTime) / duration, 1)
+        const animate = (t: number): void => {
+            startTime = startTime ?? t
+            const progress = Math.min((t - startTime) / duration, 1)
 
             const position = progress * finishLine
-
             applyTransform(element, `translateX(${position}px)`)
 
             if (progress < 1) {
@@ -169,16 +167,12 @@ const useGarageStore = create<GarageStore>((set, get) => ({
 
         try {
             await drive(id)
-
             cancelAnimationFrame(frameId)
-
             return duration
-        } catch (error) {
+        } catch {
             cancelAnimationFrame(frameId)
-
             applyTransform(element, 'translateX(0px)')
-
-            throw error
+            throw new Error('Car failed during race')
         }
     },
 
@@ -187,59 +181,73 @@ const useGarageStore = create<GarageStore>((set, get) => ({
 
         if (get().raceStatus === 'running') return
 
-        set({ raceStatus: 'running', winner: null })
+        set({
+            raceStatus: 'running',
+            winner: null,
+            winnerBanner: false
+        })
 
-        let winnerFound = false
+        let winnerLocked = false
 
-        await Promise.all(
-            cars.map(async car => {
-                const element = getCarElement(car.id)
+        const racePromises = cars.map(async car => {
+            const el = getCarElement(car.id)
+            if (!el) return
 
-                if (!element) return
+            const finish = el.parentElement?.clientWidth ?? 300
 
-                const finishLine = element.parentElement?.clientWidth ?? 300
+            try {
+                const time = await get().runCarRace(car.id, el, finish)
 
-                try {
-                    const time = await get().runCarRace(
-                        car.id,
-                        element,
-                        finishLine
-                    )
+                if (!winnerLocked) {
+                    winnerLocked = true
 
-                    if (!winnerFound) {
-                        winnerFound = true
+                    const winner = { id: car.id, time }
 
-                        set({
-                            winner: {
-                                id: car.id,
-                                time: Number(time.toFixed(2))
-                            }
+                    set({
+                        winner,
+                        winnerBanner: true
+                    })
+
+                    setTimeout(() => {
+                        set({ winnerBanner: false })
+                    }, 3000)
+
+                    const existing = await winnersApi.getWinner(winner.id)
+
+                    if (existing) {
+                        await winnersApi.updateWinner(winner.id, {
+                            wins: existing.wins + 1,
+                            time: Math.min(existing.time, winner.time)
+                        })
+                    } else {
+                        await winnersApi.createWinner({
+                            id: winner.id,
+                            wins: 1,
+                            time: winner.time
                         })
                     }
-                } catch {
-                    // ignore failure
+
+                    await useWinnersStore.getState().fetchWinners()
                 }
-            })
-        )
+            } catch {
+                // engine failure ignored
+            }
+        })
+
+        await Promise.allSettled(racePromises)
 
         set({ raceStatus: 'finished' })
     },
 
     resetRace: () => {
-        const { cars } = get()
-
-        cars.forEach(car => {
-            const element = getCarElement(car.id)
-
-            if (!element) return
-
-            applyTransform(element, 'translateX(0px)')
+        get().cars.forEach(car => {
+            const el = getCarElement(car.id)
+            if (el) {
+                applyTransform(el, 'translateX(0px)')
+            }
         })
 
-        set({
-            raceStatus: 'idle',
-            winner: null
-        })
+        set({ raceStatus: 'idle', winner: null })
     }
 }))
 

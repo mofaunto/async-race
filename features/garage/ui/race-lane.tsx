@@ -24,10 +24,13 @@ const RaceLane = ({ car }: Props): React.ReactElement => {
         if (!element) return
 
         const lane = element.closest('[data-lane]')
-
         const finishLine = lane?.clientWidth ?? 300
 
-        await runCarRace(car.id, element, finishLine)
+        try {
+            await runCarRace(car.id, element, finishLine)
+        } catch {
+            // ignore
+        }
     }
 
     const handleStop = async (): Promise<void> => {

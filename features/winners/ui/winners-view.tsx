@@ -1,38 +1,75 @@
-import CarIcon from '@/shared/ui/car-icon'
+'use client'
 
-const WinnersView = (): React.ReactElement => (
-    <section className="flex flex-col gap-6">
-        <div>
-            <h2 className="text-3xl font-bold text-yellow-400">Winners</h2>
+import { useEffect } from 'react'
 
-            <p className="text-zinc-400">Top race champions</p>
-        </div>
+import useWinnersStore from '@/shared/store/winners.store'
 
-        <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
-            <table className="table">
+const WinnersView = (): React.ReactElement => {
+    const { winners, page, total, sort, order, setPage, fetchWinners } =
+        useWinnersStore()
+
+    useEffect(() => {
+        fetchWinners()
+    }, [page, sort, order, fetchWinners])
+
+    const limit = 10
+
+    return (
+        <div className="p-4">
+            <h1 className="mb-4 text-2xl font-bold">Winners</h1>
+
+            <table className="w-full border-collapse text-left">
                 <thead>
-                    <tr>
+                    <tr className="border-b">
                         <th>#</th>
                         <th>Car</th>
                         <th>Name</th>
                         <th>Wins</th>
-                        <th>Best Time</th>
+                        <th>Best time</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    <tr>
-                        <td
-                            className="py-10 text-center text-zinc-500"
-                            colSpan={5}
-                        >
-                            No winners yet
-                        </td>
-                    </tr>
+                    {winners.map((w, i) => (
+                        <tr key={w.id} className="border-b">
+                            <td>{(page - 1) * limit + i + 1}</td>
+
+                            <td>
+                                <div
+                                    aria-label={`Car color ${w.color}`}
+                                    className="h-4 w-8 rounded"
+                                    role="img"
+                                    style={{ backgroundColor: w.color }}
+                                />
+                            </td>
+
+                            <td>{w.name}</td>
+                            <td>{w.wins}</td>
+                            <td>{w.time.toFixed(2)}</td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
+
+            <div className="mt-4 flex gap-2">
+                <button
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                    type="button"
+                >
+                    Prev
+                </button>
+
+                <button
+                    disabled={page * limit >= total}
+                    onClick={() => setPage(page + 1)}
+                    type="button"
+                >
+                    Next
+                </button>
+            </div>
         </div>
-    </section>
-)
+    )
+}
 
 export default WinnersView
