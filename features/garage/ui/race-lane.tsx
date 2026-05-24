@@ -10,18 +10,48 @@ interface Props {
 }
 
 const RaceLane = ({ car }: Props): React.ReactElement => {
-    const { openEditModal, deleteCar } = useGarageStore()
+    const { openEditModal, deleteCar, runCarRace } = useGarageStore()
 
     const handleDelete = async (): Promise<void> => {
         await deleteCar(car.id)
     }
 
+    const handleStart = async (): Promise<void> => {
+        const element = document.querySelector<HTMLElement>(
+            `[data-car-id="${car.id}"]`
+        )
+
+        if (!element) return
+
+        const lane = element.closest('[data-lane]')
+
+        const finishLine = lane?.clientWidth ?? 300
+
+        await runCarRace(car.id, element, finishLine)
+    }
+
+    const handleStop = async (): Promise<void> => {
+        const element = document.querySelector<HTMLElement>(
+            `[data-car-id="${car.id}"]`
+        )
+
+        if (!element) return
+
+        element.style.transform = 'translateX(0px)'
+    }
+
     return (
-        <div className="relative border-b border-dashed border-zinc-700 px-3 py-4 sm:px-4">
+        <div
+            data-lane
+            className="relative border-b border-dashed border-zinc-700 px-3 py-4 sm:px-4"
+        >
             <div className="mb-4 flex flex-wrap items-center gap-2">
                 <button
                     className="btn btn-xs btn-success sm:btn-sm"
                     type="button"
+                    onClick={() => {
+                        handleStart().catch(() => undefined)
+                    }}
                 >
                     Start
                 </button>
@@ -29,6 +59,9 @@ const RaceLane = ({ car }: Props): React.ReactElement => {
                 <button
                     className="btn btn-xs btn-warning sm:btn-sm"
                     type="button"
+                    onClick={() => {
+                        handleStop().catch(() => undefined)
+                    }}
                 >
                     Stop
                 </button>
@@ -61,7 +94,10 @@ const RaceLane = ({ car }: Props): React.ReactElement => {
                 <div className="absolute inset-x-0 top-1/2 border-t-2 border-dashed border-zinc-700" />
 
                 {/* car */}
-                <div className="absolute left-0 top-1/2 -translate-y-1/2">
+                <div
+                    className="absolute left-0 top-1/2 -translate-y-1/2 transition-transform"
+                    data-car-id={car.id}
+                >
                     <CarIcon color={car.color} />
                 </div>
 
