@@ -38,9 +38,18 @@ const useWinnersStore = create<WinnersStore>((set, get) => ({
     order: 'ASC',
     isLoading: false,
 
-    setPage: page => set({ page }),
-    setSort: sort => set({ sort }),
-    setOrder: order => set({ order }),
+    setPage: page => {
+        set({ page })
+        get().fetchWinners()
+    },
+    setSort: sort => {
+        set({ sort })
+        get().fetchWinners()
+    },
+    setOrder: order => {
+        set({ order })
+        get().fetchWinners()
+    },
 
     fetchWinners: async () => {
         set({ isLoading: true })

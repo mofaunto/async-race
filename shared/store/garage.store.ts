@@ -56,6 +56,17 @@ const applyTransform = (element: HTMLElement, value: string): void => {
     el.style.transform = value
 }
 
+const randomColor = (): string => {
+    const letters = '0123456789ABCDEF'
+    let color = '#'
+
+    for (let i = 0; i < 6; i += 1) {
+        color += letters[Math.floor(Math.random() * 16)]
+    }
+
+    return color
+}
+
 interface GarageStore {
     cars: Car[]
     totalCars: number
@@ -88,6 +99,7 @@ interface GarageStore {
 
     startRace: () => Promise<void>
     resetRace: () => void
+    generateCars: () => Promise<void>
 }
 
 const useGarageStore = create<GarageStore>((set, get) => ({
@@ -109,7 +121,10 @@ const useGarageStore = create<GarageStore>((set, get) => ({
 
     closeModal: () => set({ isModalOpen: false, editingCar: null }),
 
-    setPage: (page: number) => set({ page }),
+    setPage: (page: number) => {
+        set({ page })
+        get().fetchCars()
+    },
 
     fetchCars: async () => {
         set({ isLoading: true })
@@ -248,6 +263,18 @@ const useGarageStore = create<GarageStore>((set, get) => ({
         })
 
         set({ raceStatus: 'idle', winner: null })
+    },
+
+    generateCars: async () => {
+        const requests = Array.from({ length: 100 }, async (_, i) =>
+            garageApi.createCar({
+                name: `Car ${Date.now()}-${i + 1}`,
+                color: randomColor()
+            })
+        )
+
+        await Promise.all(requests)
+        await get().fetchCars()
     }
 }))
 

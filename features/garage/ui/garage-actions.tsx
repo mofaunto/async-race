@@ -7,7 +7,7 @@ import useGarageStore from '@/shared/store/garage.store'
 const DEFAULT_COLOR = '#3b82f6'
 
 const GarageActions = (): React.ReactElement => {
-    const { createCar, fetchCars } = useGarageStore()
+    const { createCar, generateCars } = useGarageStore()
 
     const [carName, setCarName] = useState('')
     const [carColor, setCarColor] = useState(DEFAULT_COLOR)
@@ -24,7 +24,7 @@ const GarageActions = (): React.ReactElement => {
 
     const handleGenerateCars = async (): Promise<void> => {
         try {
-            await fetchCars()
+            await generateCars()
         } catch {
             // ignore
         }
