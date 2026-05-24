@@ -22,9 +22,7 @@ const jsConfig = defineConfig([
         ...js.configs.recommended,
 
         settings: {
-            'import-x/resolver-next': [
-                path.resolve('.')
-            ],
+            'import-x/resolver-next': [path.resolve('.')],
 
             'import/resolver': {
                 typescript: {

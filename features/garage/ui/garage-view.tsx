@@ -1,27 +1,17 @@
-'use client'
-
-import useGarageStore from '@/shared/store/garage.store'
-
 import CarFormModal from './car-form-modal'
-import CarItem from './car-item'
-import GarageControls from './garage-controls'
+import GarageActions from './garage-actions'
+import GarageHeader from './garage-header'
+import RaceControls from './race-controls'
+import RaceTrack from './race-track'
 
-const GarageView = (): React.ReactElement => {
-    const { cars } = useGarageStore()
-
-    return (
-        <div className="flex flex-col gap-4">
-            <GarageControls />
-
-            <ul className="flex flex-col gap-2">
-                {cars.map(car => (
-                    <CarItem key={car.id} car={car} />
-                ))}
-            </ul>
-
-            <CarFormModal />
-        </div>
-    )
-}
+const GarageView = (): React.ReactElement => (
+    <section className="flex flex-col gap-6">
+        <GarageHeader />
+        <RaceControls />
+        <GarageActions />
+        <RaceTrack />
+        <CarFormModal />
+    </section>
+)
 
 export default GarageView
