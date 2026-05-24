@@ -1,49 +1,279 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with
-[`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚗 Async Race
 
-## Getting Started
+**Live Demo:**  
+https://async-race-mu.vercel.app
 
-First, run the development server:
+A single-page racing simulator where users manage a garage of radio-controlled
+cars, start races, and track winners with persistent statistics.
+
+Built as part of the EPAM Frontend Engineering assessment.
+
+---
+
+# 🧱 Tech Stack
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript (strict mode enabled)
+- Zustand (state management)
+- Axios (API communication)
+- Tailwind CSS
+- ESLint (Airbnb configuration)
+- Prettier
+
+---
+
+# 🚀 Features
+
+## Garage View
+
+- Create cars
+- Update cars
+- Delete cars
+- Generate 100 random cars
+- Responsive garage layout
+- Pagination
+
+## Race System
+
+- Start engine animation
+- Stop engine animation
+- Start race for all cars
+- Reset race
+- First finisher winner detection
+- Winner announcement
+- Responsive race animation
+- Proper async race handling
+- Engine failure handling
+
+## Winners View
+
+- Winners table
+- Pagination
+- Sorting by wins
+- Sorting by best time
+- Persistent winners statistics
+- Best result preservation
+
+---
+
+# 📦 API Integration
+
+The application works with the provided mock backend API.
+
+Used endpoints:
+
+- `/garage`
+- `/engine`
+- `/winners`
+
+Backend is not included in deployment and should be run separately by the
+evaluator.
+
+---
+
+# 📱 Deployment
+
+Production URL:
+
+https://async-race-mu.vercel.app
+
+---
+
+# 📥 Local Setup
+
+## 1. Install dependencies
+
+```bash
+npm install
+```
+
+## 2. Configure environment variables
+
+Create `.env.local`
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+## 3. Start development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the
-result.
+## 4. Run backend server separately
 
-You can start editing the page by modifying `app/page.tsx`. The page
-auto-updates as you edit the file.
+The provided mock server should run locally.
 
-This project uses
-[`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts)
-to automatically optimize and load [Geist](https://vercel.com/font), a new font
-family for Vercel.
+---
 
-## Learn More
+# 📊 Checklist (Self Evaluation)
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 UI Deployment (10/10)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js
-  features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [x] Application deployed on Vercel
 
-You can check out
-[the Next.js GitHub repository](https://github.com/vercel/next.js) - your
-feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## ✅ Requirements to Commits and Repository (20/20)
 
-The easiest way to deploy your Next.js app is to use the
-[Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme)
-from the creators of Next.js.
+- [x] Conventional commits used
+- [x] Checklist included in README
+- [x] Score calculation included
+- [x] Deployment link included
 
-Check out our
-[Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying)
-for more details.
+---
+
+# 🧱 Basic Structure (80/80)
+
+## Two Views (10/10)
+
+- [x] Garage view
+- [x] Winners view
+
+## Garage View Content (30/30)
+
+- [x] Garage title
+- [x] Car creation panel
+- [x] Race controls
+- [x] Garage section
+
+## Winners View Content (10/10)
+
+- [x] Winners title
+- [x] Winners table
+- [x] Pagination
+
+## Persistent State (30/30)
+
+- [x] Pagination preserved
+- [x] Store state preserved
+- [x] UI state preserved
+
+---
+
+# 🚗 Garage View (90/90)
+
+## CRUD Operations (20/20)
+
+- [x] Create car
+- [x] Update car
+- [x] Delete car
+
+## Color Selection (10/10)
+
+- [x] Color picker implemented
+
+## Random Car Generation (20/20)
+
+- [x] Generate 100 random cars
+- [x] Random colors generated
+
+## Car Management Buttons (10/10)
+
+- [x] Select button
+- [x] Delete button
+- [x] Start button
+- [x] Stop button
+
+## Pagination (10/10)
+
+- [x] 7 cars per page
+
+---
+
+# 🏆 Winners View (50/50)
+
+## Display Winners (15/15)
+
+- [x] Winners displayed after races
+
+## Pagination for Winners (10/10)
+
+- [x] 10 winners per page
+
+## Winners Table (15/15)
+
+- [x] Car number
+- [x] Car color
+- [x] Car name
+- [x] Wins count
+- [x] Best time
+
+## Sorting Functionality (10/10)
+
+- [x] Sort by wins
+- [x] Sort by best time
+
+---
+
+# 🚦 Race (170/170)
+
+## Start Engine Animation (20/20)
+
+- [x] Animation starts correctly
+- [x] Handles engine failures
+
+## Stop Engine Animation (20/20)
+
+- [x] Cars reset correctly
+
+## Responsive Animation (30/30)
+
+- [x] Works on small screens
+
+## Start Race Button (10/10)
+
+- [x] Starts all cars
+
+## Reset Race Button (15/15)
+
+- [x] Resets all cars
+
+## Winner Announcement (5/5)
+
+- [x] Winner announcement implemented
+
+## Button States (20/20)
+
+- [x] Correct disabled states
+
+## Actions During Race (50/50)
+
+- [x] Stable race handling
+- [x] Predictable async behavior
+
+---
+
+# 🎨 ESLint & Prettier (10/10)
+
+## Prettier Setup (5/5)
+
+- [x] Formatting scripts configured
+
+## ESLint Configuration (5/5)
+
+- [x] Airbnb configuration used
+- [x] Strict TypeScript enabled
+
+---
+
+# 🌟 Overall Code Quality
+
+## Architecture & Code Quality
+
+- Modular architecture
+- API abstraction layer
+- Zustand state separation
+- TypeScript strict mode
+- Reusable UI components
+- Responsive design
+- Minimal duplication
+- Readable naming conventions
+
+---
+
+# 🧮 Final Score
+
+## Estimated Score: **350 / 400**
